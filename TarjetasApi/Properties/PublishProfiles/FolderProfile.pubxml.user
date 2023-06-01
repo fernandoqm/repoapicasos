@@ -5,7 +5,7 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
 <Project>
   <PropertyGroup>
     <_PublishTargetUrl>C:\inetpub\wwwroot\apiCasos</_PublishTargetUrl>
-    <History>True|2023-05-31T21:43:56.4413632Z;True|2023-05-31T15:40:21.7179521-06:00;False|2023-05-31T15:40:15.2440346-06:00;</History>
+    <History>True|2023-06-01T05:20:15.2281814Z;</History>
     <LastFailureDetails />
   </PropertyGroup>
 </Project>

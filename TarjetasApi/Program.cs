@@ -17,7 +17,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(
 
 
 var app = builder.Build();
-if (app.Environment.IsDevelopment())
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {
     app.UseSwagger();
     app.UseSwaggerUI();

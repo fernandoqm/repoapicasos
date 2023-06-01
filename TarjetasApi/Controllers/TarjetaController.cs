@@ -10,7 +10,6 @@ namespace TarjetasApi.Controllers
     [Route("api/tarjetas")]
     public class TarjetaController : ControllerBase
     {
-        [EnableCors("AllowOrigin")]
         [HttpGet]
         public async Task<ActionResult<List<tarjeta>>> TodasTarjetas()
         {
