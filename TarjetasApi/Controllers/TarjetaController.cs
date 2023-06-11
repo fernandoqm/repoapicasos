@@ -6,10 +6,11 @@ using TarjetasApi.Infrastructure.Repositories;
 
 namespace TarjetasApi.Controllers
 {
+    [Route("api")]
     [ApiController]
-    [Route("api/tarjetas")]
     public class TarjetaController : ControllerBase
     {
+        [Route("tarjetas")]
         [HttpGet]
         public async Task<ActionResult<List<tarjeta>>> TodasTarjetas()
         {
@@ -25,6 +26,24 @@ namespace TarjetasApi.Controllers
             }
 
         }
+
+        [Route("conteoDatos")]
+        [HttpGet]
+        public async Task<ActionResult<List<conteo>>> ConteoDatos()
+        {
+            try
+            {
+                var repo = new TarjetaRepository();
+                var lista = await repo.conteo();
+                return lista;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+
+        }
+
 
         [HttpPost]
         public async Task InsertTarjeta([FromBody] tarjeta tarjeta)

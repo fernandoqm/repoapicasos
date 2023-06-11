@@ -79,7 +79,7 @@ namespace TarjetasApi.Infrastructure.Repositories
                     string sql = "";
                     sql =  "select id_tarjeta, caso, t.tipo_caso, tc.descripcion,t.id_proyecto,p.nombre, reportado_por, t.solucionado_por, ";
                     sql += "fecha_reporte, fecha_inicio_atencion, fecha_fin_atencion, case when fecha_aprobacion is null then 'N' else 'S' end esAprobado, ";
-                    sql += "t.estado as tarjeta_estado, e.descripcion as estado, cantidad_incidencias, branch_padre, entregado_cliente, version, script, t.notas, t.merge_padre  ";
+                    sql += "t.estado, e.descripcion as desc_estado, cantidad_incidencias, branch_padre, entregado_cliente, version, script, t.notas, t.merge_padre  ";
                     sql += "from tarjeta t  ";
                     sql += "  left outer join tipo_casos tc on t.tipo_caso = tc.tipo_caso  ";
                     sql += "  left outer join proyectos p on t.id_proyecto = p.id_proyecto  ";
@@ -105,6 +105,7 @@ namespace TarjetasApi.Infrastructure.Repositories
                                 oTarjeta.fecha_inicio_atencion = (DateTime)items["fecha_inicio_atencion"];
                                 oTarjeta.fecha_fin_atencion = (DateTime)items["fecha_fin_atencion"];
                                 oTarjeta.estado = (string)items["estado"];
+                                oTarjeta.desc_estado = (string)items["desc_estado"];
                                 oTarjeta.cantidad_incidencias = (Int16)items["cantidad_incidencias"];
                                 oTarjeta.branch_padre = (string)items["branch_padre"];
                                 oTarjeta.notas = (string)items["notas"];
@@ -127,6 +128,63 @@ namespace TarjetasApi.Infrastructure.Repositories
             }
 
         }
+
+
+        public async Task<List<conteo>> conteo()
+        {
+
+            var lista = new List<conteo>();
+            try
+            {
+                await using (var conn = new NpgsqlConnection(_Conn))
+                {
+                    conn.Open();
+                    string sql = "";
+
+                    sql = "select sum(a.anulados) anulados, sum(a.en_desarrollo) en_desarrollo, sum(a.en_testing) en_testing, ";
+                    sql += "sum(a.finalizado) finalizado, sum(a.rechazado) rechazado,sum(a.en_pausa) en_pausa, sum(total_casos) as total_casos  ";
+                    sql += "from ";
+                    sql += "(select case when t.estado = 'an' then count(t.id_tarjeta) else 0 end anulados, ";
+                    sql += "case when t.estado = 'ed' then count(t.id_tarjeta) else 0 end en_desarrollo, ";
+                    sql += "case when t.estado = 'et' then count(t.id_tarjeta) else 0 end en_testing, ";
+                    sql += "case when t.estado = 'fi' then count(t.id_tarjeta) else 0 end finalizado, ";
+                    sql += "case when t.estado = 're' then count(t.id_tarjeta) else 0 end rechazado, ";
+                    sql += "case when t.estado = 'ep' then count(t.id_tarjeta) else 0 end en_pausa, ";
+                    sql += "count(t.id_tarjeta) as total_casos ";
+                    sql += "from tarjeta t ";
+                    sql += "group by t.estado ";
+                    sql += ") as a ";
+
+
+                    await using (NpgsqlCommand cmd = new NpgsqlCommand(sql, conn))
+                    {
+                        await using (var items = await cmd.ExecuteReaderAsync())
+                        {
+                            while (await items.ReadAsync())
+                            {
+                                var oConteo = new conteo();
+                                oConteo.anulados = (decimal)items["anulados"];
+                                oConteo.en_desarrollo = (decimal)items["en_desarrollo"];
+                                oConteo.en_pausa = (decimal)items["en_pausa"];
+                                oConteo.finalizado = (decimal)items["finalizado"];
+                                oConteo.en_testing = (decimal)items["en_testing"];
+                                oConteo.rechazados = (decimal)items["rechazado"];
+                                oConteo.total_casos = (decimal)items["total_casos"];
+
+                                lista.Add(oConteo);
+                            }
+                        }
+                    }
+                }
+                return lista;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+
+        }
+
 
         public async Task<bool> UpdateTarjetaAsync(tarjeta tarjeta)
         {
