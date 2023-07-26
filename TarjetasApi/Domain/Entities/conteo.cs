@@ -2,7 +2,6 @@
 {
     public class conteo
     {
-
         public decimal anulados { get; set; }
         public decimal en_desarrollo { get; set; }
         public decimal en_pausa { get; set; }

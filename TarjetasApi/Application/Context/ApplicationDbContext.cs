@@ -12,6 +12,7 @@ namespace TarjetasApi.Application.Context
         }
 
         public DbSet<tarjeta> Tarjetas { get; set; }
+        public DbSet<usuario_seguridad> UsuarioSeguridad { get; set; }
 
     }
 }
